@@ -5,20 +5,20 @@ echo "=== Instalando entorno PDA ==="
 # Actualizar paquetes
 apt update && apt upgrade -y
 
-# Instalar herramientas básicas
-apt install -y python3 python3-pip curl ssh npm ffmpeg tesseract-ocr poppler-utils git build-essential libgl1
+# Instalar herramientas básicas + cmatrix
+apt install -y python3 python3-pip curl ssh npm ffmpeg tesseract-ocr poppler-utils git build-essential libgl1 cmatrix
 
-# Instalar pip y directorios
+# Actualizar pip y crear directorios
 pip install --upgrade pip setuptools wheel
 mkdir -p ~/pda_project/pda_output
 cd ~/pda_project || exit
 
-# Instalar dependencias Python
-pip install pdf2image pytesseract docx2txt textract gTTS deep-translator openai-whisper Pillow
+# Instalar librerías Python requeridas
+pip install Flask pytesseract pdf2image Pillow docx2txt textract beautifulsoup4 ebooklib deep-translator gTTS pydub whisper openai-whisper torch textwrap3 bs4
 
-# Crear archivo principal del menú
+# Crear archivo principal del menú (igual que antes)
 cat > menu.py << 'EOF'
-[import os
+import os
 from pathlib import Path
 from pdf2image import convert_from_path
 import pytesseract
@@ -90,59 +90,4 @@ def main():
         print("3. Texto a audio (TTS multilenguaje)")
         print("4. Traducir texto")
         print("5. Audio a texto (Whisper multilenguaje)")
-        print("6. Salir")
-        choice = input("\nSelecciona una opción: ")
-
-        if choice == '1':
-            path = input("Ruta del archivo (PDF/DOCX/TXT): ")
-            text = file_to_text(path)
-            print("\n>>> TEXTO EXTRAÍDO:\n")
-            print(text[:1000] + "\n...")
-            save_text(text)
-            pause()
-
-        elif choice == '2':
-            path = input("Ruta de la imagen (JPG/PNG): ")
-            text = image_to_text(path)
-            print("\n>>> TEXTO OCR:\n")
-            print(text)
-            save_text(text, "ocr_output.txt")
-            pause()
-
-        elif choice == '3':
-            text = input("Texto a convertir a voz: ")
-            filename = input("Nombre del archivo de audio (output.mp3): ") or "output.mp3"
-            lang = input("Idioma (ej: es, en, fr, de): ") or "es"
-            text_to_audio(text, filename, lang)
-            pause()
-
-        elif choice == '4':
-            text = input("Texto a traducir: ")
-            lang = input("Idioma destino (ej: en, es, fr): ")
-            translated = translate_text(text, lang)
-            print(f"\n>>> TEXTO TRADUCIDO [{lang}]:\n{translated}")
-            save_text(translated, f"translated_{lang}.txt")
-            pause()
-
-        elif choice == '5':
-            path = input("Ruta del archivo de audio/video: ")
-            lang = input("Código del idioma (opcional, ej: en, es, fr): ") or None
-            print("Procesando audio, esto puede tardar...")
-            text = audio_to_text(path, lang)
-            print("\n>>> TRANSCRIPCIÓN:\n")
-            print(text)
-            save_text(text, "transcripcion.txt")
-            pause()
-
-        elif choice == '6':
-            break
-
-        else:
-            print("Opción inválida.")
-            pause()
-
-if __name__ == "__main__":
-    main()]EOF
-
-echo -e "\n>>> Instalación completada."
-echo "Para ejecutar el menú, ve a ~/pda_project y escribe: python3 menu.py"
+        print("6. Mostrar efecto
